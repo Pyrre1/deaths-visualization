@@ -77,3 +77,21 @@ For a VG grade, integrate **one** AI/ML feature into the application. Pick one b
 ## Acknowledgements
 
 *Resources, attributions, or shoutouts.*
+
+## Production Security Note
+
+`NODE_TLS_REJECT_UNAUTHORIZED=0` is set in `.env.local` to bypass SSL certificate 
+verification for the school server (`cu1034.camp.lnu.se`) which uses a self-signed cert. 
+This is intentionally insecure and **must be removed before deploying anywhere public**.
+
+### What to do before production deployment:
+
+1. Remove `NODE_TLS_REJECT_UNAUTHORIZED=0` from your environment variables entirely
+2. Either:
+   - Get a proper SSL certificate installed on the API server (e.g. Let's Encrypt), OR
+   - Add the school's self-signed CA cert to Node's trust store via `NODE_EXTRA_CA_CERTS=/path/to/ca.crt` 
+3. Remove the `// @ts-expect-error` agent workaround lines in 
+   `app/api/auth/[...nextauth]/route.ts` if any remain
+4. Verify the API calls work with `NODE_TLS_REJECT_UNAUTHORIZED` unset before deploying
+
+The auth flow itself is fine — this is purely a certificate trust issue with the dev environment.

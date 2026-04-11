@@ -5,23 +5,28 @@ const handler = NextAuth({
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!
+      clientSecret: process.env.GITHUB_SECRET!,
+      checks: ["pkce"],
     })
   ],
   callbacks: {
     async jwt({ token }) {
       // Only fetch API token once (first sign in)
       if (!token.apiToken) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const https = require("https")
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/token`, {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
             username: process.env.API_USERNAME!,
             password: process.env.API_PASSWORD!
           }),
+          // @ts-expect-error - bypass self-signed cert on school server
+          agent: new https.Agent({ rejectUnauthorized: false }),
         })
         const data = await res.json()
-        token.apiToken = data.token
+        token.apiToken = data.access_token
       }
       return token
     },

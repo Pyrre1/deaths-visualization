@@ -10,17 +10,18 @@ const handler = NextAuth({
     })
   ],
   callbacks: {
-    async jwt({ token }) {
+    async jwt({ token, account, profile }) {
       // Only fetch API token once (first sign in)
       if (!token.apiToken) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const https = require("https")
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/token`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/oauth`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            username: process.env.API_USERNAME!,
-            password: process.env.API_PASSWORD!
+            github_id: String((profile as { id?: number }).id ?? account?.providerAccountId),
+            email: token.email,
+            name: token.name,
           }),
           // @ts-expect-error - bypass self-signed cert on school server
           agent: new https.Agent({ rejectUnauthorized: false }),

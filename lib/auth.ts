@@ -9,7 +9,14 @@ export const authOptions: NextAuthOptions = {
       checks: ["pkce"],
     }),
   ],
+  pages: {
+    signIn: "/api/auth/signin",
+  },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url
+      return `${baseUrl}/dashboard`
+    },
     async jwt({ token, account, profile }) {
       if (account && profile) {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/oauth`, {

@@ -21,7 +21,7 @@ export default function TopCausesChart({ regionCode, year, limit }: Props) {
   useEffect(() => {
     async function load() {
       // Semi hardcoded to url to test how it behaves in the browser.
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/deaths?from_year=${year}&to_year=${year}&region_code=${regionCode}&sex_code=3&exclude_diagnosis_code=99&age_code=99&order_by=value&direction=desc&limit=${limit}`
+      const url = `${process.env.API_BASE_URL}/v1/deaths?from_year=${year}&to_year=${year}&region_code=${regionCode}&sex_code=3&exclude_diagnosis_code=99&age_code=99&order_by=value&direction=desc&limit=${limit}`
 
       console.log("Fetching:", url)
 

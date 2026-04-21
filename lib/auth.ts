@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, account, profile }) {
       if (account && profile) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/oauth`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/api/v1/auth/oauth`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

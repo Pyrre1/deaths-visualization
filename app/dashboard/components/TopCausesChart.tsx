@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-
-type DeathRecord = {
-  diagnosis_name: string
-  value: number
-}
+import { fetchDeaths, type DeathRecord } from "@/lib/apiClient"
 
 type Props = {
   regionCode: number
@@ -17,44 +13,27 @@ type Props = {
 export default function TopCausesChart({ regionCode, year, limit }: Props) {
   const [data, setData] = useState<DeathRecord[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    async function load() {
-      // Semi hardcoded to url to test how it behaves in the browser.
-      const url = `${process.env.API_BASE_URL}/v1/deaths?from_year=${year}&to_year=${year}&region_code=${regionCode}&sex_code=3&exclude_diagnosis_code=99&age_code=99&order_by=value&direction=desc&limit=${limit}`
-
-      console.log("Fetching:", url)
-
-      try {
-        const res = await fetch(url)
-
-        if (!res.ok) {
-          return
-        }
-
-        const json = await res.json()
-
-        if (!json.data) {
-          return
-        }
-
-        setData(
-          json.data.map((d: unknown) => ({
-            diagnosis_name: (d as { diagnosis_name?: string }).diagnosis_name,
-            value: (d as { value?: number }).value,
-          }))
-        )
-      } catch (err) {
-        console.error("Failed to fetch top causes", err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
+    fetchDeaths({
+      from_year: year,
+      to_year: year,
+      region_code: regionCode,
+      sex_code: 3,
+      exclude_diagnosis_code: "99",
+      age_code: 99,
+      order_by: "value",
+      direction: "desc",
+      limit,
+    })
+      .then(setData)
+      .catch(() => setError("Failed to load data"))
+      .finally(() => setLoading(false))
   }, [regionCode, year, limit])
 
   if (loading) return <p className="text-sm text-gray-500">Loading...</p>
+  if (error) return <p className="text-sm text-red-500">{error}</p>
 
   return (
     <ResponsiveContainer width="100%" height={300}>

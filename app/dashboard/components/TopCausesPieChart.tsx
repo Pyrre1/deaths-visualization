@@ -7,7 +7,7 @@ const COLORS = ["#3b82f6","#ef4444","#10b981","#f59e0b","#8b5cf6","#ec4899","#14
 
 type Props = {
   regionCode: number
-  onDiagnosisSelect: (code: string) => void
+  onDiagnosisSelect: (code: string, name: string) => void
 }
 
 export default function TopCausesPieChart({ regionCode, onDiagnosisSelect }: Props) {
@@ -47,7 +47,10 @@ export default function TopCausesPieChart({ regionCode, onDiagnosisSelect }: Pro
           cx="50%"
           cy="50%"
           outerRadius={100}
-          onClick={(entry) => onDiagnosisSelect((entry as unknown as DeathRecord).diagnosis_code)}
+          onClick={(entry) => {
+            const record = entry as unknown as DeathRecord
+            onDiagnosisSelect(record.diagnosis_code, record.diagnosis_name)
+          }}
           className="cursor-pointer"
         >
           {data.map((_, i) => (

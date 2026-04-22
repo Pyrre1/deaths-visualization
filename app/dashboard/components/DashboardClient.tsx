@@ -1,6 +1,8 @@
 "use client"
 import { useState } from "react"
 import RegionList from "./RegionList"
+import { REGIONS } from "@/lib/regions"
+import DataView from "./DataView"
 
 type Props = {
   userName: string | null | undefined
@@ -9,6 +11,7 @@ type Props = {
 export default function DashboardClient({ userName }: Props) {
   const [selectedRegion, setSelectedRegion] = useState<number | null>(null)
 
+  const regionName = REGIONS.find(r => r.code === selectedRegion)?.name ?? ""
   return (
     <div className="flex h-screen">
       <RegionList selected={selectedRegion} onSelect={setSelectedRegion} />
@@ -18,7 +21,7 @@ export default function DashboardClient({ userName }: Props) {
         {selectedRegion === null ? (
           <p className="text-gray-400">Select a region to view data.</p>
         ) : (
-          <p className="text-gray-400">Region {selectedRegion} selected — charts coming soon.</p>
+          <DataView regionCode={selectedRegion} regionName={regionName} />
         )}
       </main>
     </div>

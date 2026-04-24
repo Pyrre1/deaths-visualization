@@ -35,10 +35,21 @@ export type DeathsResponse = {
   data: DeathRecord[]
 }
 
+const api = axios.create()
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      window.location.href = "/"
+    }
+    return Promise.reject(error)
+  }
+)
+
 export async function fetchDeaths(filters: DeathFilters): Promise<DeathRecord[]> {
   const params = Object.fromEntries(
     Object.entries(filters).filter(([, v]) => v !== undefined)
   )
-  const res = await axios.get<DeathsResponse>("/api/deaths", { params })
+  const res = await api.get<DeathsResponse>("/api/deaths", { params })
   return res.data.data
 }

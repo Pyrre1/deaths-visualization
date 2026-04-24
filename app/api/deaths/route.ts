@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
 
   if (session?.apiToken) {
     headers["Authorization"] = `Bearer ${session.apiToken}`
+  } else {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const res = await fetch(url, { headers })

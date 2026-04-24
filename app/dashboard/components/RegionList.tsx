@@ -10,7 +10,7 @@ export default function RegionList({ selected, onSelect }: Props) {
   return (
     <nav className="w-56 shrink-0 border-r border-gray-200 h-full overflow-y-auto">
       <p className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-        Regions
+        Regioner
       </p>
       <ul>
         {REGIONS.map((r) => (

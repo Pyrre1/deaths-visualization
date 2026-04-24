@@ -16,10 +16,10 @@ export default function DashboardClient({ userName }: Props) {
     <div className="flex h-screen">
       <RegionList selected={selectedRegion} onSelect={setSelectedRegion} />
       <main className="flex-1 p-8 overflow-y-auto">
-        <h1 className="text-2xl font-bold mb-1">Dashboard</h1>
-        <p className="text-sm text-gray-500 mb-6">Welcome, {userName}</p>
+        <h1 className="text-2xl font-bold mb-1">Datavisualiseringen</h1>
+        <p className="text-sm text-gray-500 mb-6">Välkommen, {userName}!</p>
         {selectedRegion === null ? (
-          <p className="text-gray-400">Select a region to view data.</p>
+          <p className="text-gray-400">Välj en region för att visa data.</p>
         ) : (
           <DataView regionCode={selectedRegion} regionName={regionName} />
         )}

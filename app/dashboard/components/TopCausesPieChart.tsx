@@ -8,45 +8,55 @@ const COLORS = ["#3b82f6","#ef4444","#10b981","#f59e0b","#8b5cf6","#ec4899","#14
 type Props = {
   regionCode: number
   onDiagnosisSelect: (code: string, name: string) => void
+  year: number
 }
 
-export default function TopCausesPieChart({ regionCode, onDiagnosisSelect }: Props) {
+export default function TopCausesPieChart({ regionCode, onDiagnosisSelect, year }: Props) {
   const [data, setData] = useState<DeathRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    setLoading(true)
-    setError(null)
-    fetchDeaths({
-      exclude_diagnosis_code: "99",
-      age_code: 99,
-      sex_code: 3,
-      order_by: "value",
-      direction: "desc",
-      limit: 10,
-      from_year: 2024,
-      to_year: 2024,
-      region_code: regionCode,
-    })
-      .then(setData)
-      .catch(() => setError("Failed to load data"))
-      .finally(() => setLoading(false))
-  }, [regionCode])
+    let cancelled = false
+    async function load() {
+      setLoading(true)
+      setError(null)
+      try {
+        const results = await fetchDeaths({
+        exclude_diagnosis_code: "99",
+        age_code: 99,
+        sex_code: 3,
+        order_by: "value",
+        direction: "desc",
+        limit: 10,
+        from_year: year,
+        to_year: year,
+        region_code: regionCode,
+      })
+        if (!cancelled) setData(results)
+      } catch {
+        if (!cancelled) setError("Failed to load data")
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [regionCode, year])
 
   if (loading) return <p className="text-sm text-gray-500">Loading...</p>
   if (error) return <p className="text-sm text-red-500">{error}</p>
 
   return (
-    <ResponsiveContainer width="100%" height={320}>
+    <ResponsiveContainer width="100%" height={365}>
       <PieChart>
         <Pie
           data={data}
           dataKey="value"
           nameKey="diagnosis_name"
           cx="50%"
-          cy="50%"
-          outerRadius={100}
+          cy="45%"
+          outerRadius={110}
           onClick={(entry) => {
             const record = entry as unknown as DeathRecord
             onDiagnosisSelect(record.diagnosis_code, record.diagnosis_name)
@@ -58,7 +68,14 @@ export default function TopCausesPieChart({ regionCode, onDiagnosisSelect }: Pro
           ))}
         </Pie>
         <Tooltip formatter={(v) => `${v} deaths`} />
-        <Legend />
+        <Legend
+          layout="vertical"
+          align="left"
+          verticalAlign="middle"
+          formatter={(value: string) => (
+            <span style={{fontSize:"11px", display:"inline-block", width:"180px"}}>{value}</span>
+          )}
+        />
       </PieChart>
     </ResponsiveContainer>
   )

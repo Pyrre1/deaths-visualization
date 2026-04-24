@@ -7,7 +7,7 @@ export default function Navbar() {
 
   return (
     <nav className="w-full px-6 py-4 border-b flex items-center justify-between">
-      <span className="font-semibold">Swedish Death Statistics</span>
+      <span className="font-semibold">Dödsorsaksstatistik från socialstyrelsen</span>
 
       <div>
         {status === "loading" && (
@@ -18,7 +18,7 @@ export default function Navbar() {
             onClick={() => signIn("github")}
             className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 text-sm"
           >
-            Sign in with GitHub
+            Logga in med GitHub
           </button>
         )}
 
@@ -29,7 +29,7 @@ export default function Navbar() {
               onClick={() => signOut({ callbackUrl: window.location.origin })}
               className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
             >
-              Sign out
+              Logga ut
             </button>
           </div>
         )}

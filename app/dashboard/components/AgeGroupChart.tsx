@@ -74,10 +74,10 @@ export default function AgeGroupChart({ regionCode, diagnosisCode, year }: Props
   }, [regionCode, diagnosisCode, sexMode, year])
 
   const radioOptions: { label: string; value: SexMode }[] = [
-    { label: "Both sexes", value: "both" },
-    { label: "Men", value: "men" },
-    { label: "Women", value: "women" },
-    { label: "Men/Women", value: "grouped" },
+    { label: "Total", value: "both" },
+    { label: "Män", value: "men" },
+    { label: "Kvinnor", value: "women" },
+    { label: "Uppdelat", value: "grouped" },
   ]
 
   return (

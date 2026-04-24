@@ -1,11 +1,20 @@
 "use client"
 import { REGIONS } from "@/lib/regions"
 
+/**
+ * Props for {@link RegionList}.
+ */
 type Props = {
+  /** Currently selected region code, or `null` if none selected. */
   selected: number | null
+  /** Called with the region code when the user clicks a region button. */
   onSelect: (code: number) => void
 }
 
+/**
+ * Sidebar navigation listing all Swedish regions.
+ * Highlights the active region and calls `onSelect` on click.
+ */
 export default function RegionList({ selected, onSelect }: Props) {
   return (
     <nav className="w-56 shrink-0 border-r border-gray-200 h-full overflow-y-auto">

@@ -4,10 +4,21 @@ import RegionList from "./RegionList"
 import { REGIONS } from "@/lib/regions"
 import DataView from "./DataView"
 
+/**
+ * Props for {@link DashboardClient}.
+ */
 type Props = {
+  /** Display name of the signed-in user, sourced from the NextAuth session. */
   userName: string | null | undefined
 }
 
+/**
+ * Client-side shell for the dashboard page.
+ *
+ * Owns `selectedRegion` state and passes it down to {@link RegionList}
+ * (for highlighting) and {@link DataView} (for data fetching).
+ * Renders a prompt when no region is selected.
+ */
 export default function DashboardClient({ userName }: Props) {
   const [selectedRegion, setSelectedRegion] = useState<number | null>(null)
 

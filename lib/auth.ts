@@ -1,6 +1,16 @@
 import GithubProvider from "next-auth/providers/github"
 import type { NextAuthOptions } from "next-auth"
 
+/**
+ * NextAuth configuration for the application.
+ *
+ * Authentication flow:
+ * 1. User signs in with GitHub OAuth (PKCE).
+ * 2. The `jwt` callback exchanges the GitHub profile for backend API tokens.
+ * 3. On every subsequent request the `jwt` callback silently refreshes the
+ *    access token when it has expired.
+ * 4. The `session` callback exposes `apiToken` to the client session.
+ */
 export const authOptions: NextAuthOptions = {
   providers: [
     GithubProvider({
@@ -13,12 +23,23 @@ export const authOptions: NextAuthOptions = {
     signIn: "/api/auth/signin",
   },
   callbacks: {
+    /**
+       * Redirects to /dashboard after sign-in for same-origin URLs,
+       * blocking open-redirect attacks from external `callbackUrl` values.
+       */
     async redirect({ url, baseUrl }) {
       if (url.startsWith(baseUrl)) return url
       return `${baseUrl}/dashboard`
     },
     async jwt({ token, account, profile }) {
-      // Initial login — exchange GitHub OAuth for API tokens
+      /**
+       * Runs on every JWT creation or update.
+       * Three branches:
+       *   1. Initial login (`account` present) — exchange GitHub identity for API tokens.
+       *   2. Token still valid — return unchanged.
+       *   3. Token expired — attempt silent refresh; null `apiToken` on failure so the
+       *      proxy returns 401 and the interceptor in `apiClient.ts` redirects to sign-in.
+       */
       if (account && profile) {
         const res = await fetch(`${process.env.API_BASE_URL}/api/v1/auth/oauth`, {
           method: "POST",
@@ -44,7 +65,7 @@ export const authOptions: NextAuthOptions = {
         return token
       }
 
-      // Token expired — refresh
+      // Access token expired — attempt a silent refresh using the stored refresh token.
       try {
         const res = await fetch(`${process.env.API_BASE_URL}/api/v1/auth/refresh`, {
           method: "POST",
@@ -57,11 +78,16 @@ export const authOptions: NextAuthOptions = {
           token.refreshToken = data.refresh_token
           token.expiresAt = Date.now() + data.expires_in * 1000
       } catch {
-        //Refresh token expired or invalid, force re-login
+        // Refresh token is expired or invalid. Nulling apiToken causes the proxy
+        // to return 401, which the axios interceptor converts to a redirect to "/".
         token.apiToken = null
       }
       return token
     },
+    /**
+     * Copies `apiToken` from the JWT into the client-visible session.
+     * Only `apiToken` is forwarded — refresh token and expiry stay server-side.
+     */
     async session({ session, token }) {
       session.apiToken = token.apiToken as string
       return session

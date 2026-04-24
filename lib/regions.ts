@@ -1,3 +1,7 @@
+/**
+ * Static list of all 21 Swedish regions plus the national aggregate ("Riket").
+ * Region codes match those used by the upstream deaths API (`region_code` field).
+ */
 export const REGIONS: { code: number; name: string }[] = [
   { code: 0, name: "Riket" },
   { code: 1, name: "Stockholms län" },

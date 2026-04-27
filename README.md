@@ -82,8 +82,10 @@ For a VG grade, integrate **one** AI/ML feature into the application. Pick one b
 |---|---|
 | `NEXTAUTH_URL` | Public URL of the Next.js app |
 | `NEXTAUTH_SECRET` | Random secret for session encryption |
-| `GITHUB_ID` | OAuth provider client ID |
-| `GITHUB_SECRET` | OAuth provider client secret |
+| `GITHUB_ID` | OAuth provider client (GitHub) ID |
+| `GITHUB_SECRET` | OAuth provider client (GitHub) secret |
+| `GOOGLE_ID` | OAuth provider client (Google) ID |
+| `GOOGLE_SECRET` | OAuth provider client (Google) secret |
 | `API_BASE_URL` | Internal URL of the WT1 API |
 | `INTERNAL_SECRET` | Internal secret to verify the comunication from WT to API is not tempered with |
 

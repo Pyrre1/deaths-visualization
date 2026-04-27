@@ -1,4 +1,6 @@
 import GithubProvider from "next-auth/providers/github"
+import GoogleProvider from "next-auth/providers/google"
+
 import type { NextAuthOptions } from "next-auth"
 
 /**
@@ -18,6 +20,10 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GITHUB_SECRET!,
       checks: ["pkce"],
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID!,
+      clientSecret: process.env.GOOGLE_SECRET!,
+    }),
   ],
   pages: {
     signIn: "/api/auth/signin",
@@ -35,12 +41,15 @@ export const authOptions: NextAuthOptions = {
       /**
        * Runs on every JWT creation or update.
        * Three branches:
-       *   1. Initial login (`account` present) — exchange GitHub identity for API tokens.
+       *   1. Initial login (`account` present) — exchange OAuth provider identity (GitHub or Google) for API tokens.
        *   2. Token still valid — return unchanged.
        *   3. Token expired — attempt silent refresh; null `apiToken` on failure so the
        *      proxy returns 401 and the interceptor in `apiClient.ts` redirects to sign-in.
        */
       if (account && profile) {
+        const provider = account.provider
+        const providerId = account.providerAccountId
+
         const res = await fetch(`${process.env.API_BASE_URL}/api/v1/auth/oauth`, {
           method: "POST",
           headers: {
@@ -48,7 +57,9 @@ export const authOptions: NextAuthOptions = {
             "X-Internal-Secret": process.env.INTERNAL_SECRET!,
           },
           body: JSON.stringify({
-            github_id: String((profile as { id?: number }).id ?? account.providerAccountId),
+            provider,
+            provider_id: providerId,
+            // github_id: String((profile as { id?: number }).id ?? account.providerAccountId),
             email: token.email,
             name: token.name,
           }),
